@@ -36,9 +36,12 @@ const productSchema  = new mongoose.Schema({
         },
         required : true
     },
-    catagory : {
+    category : {
         type : String,
-        enum : ["electronics", "grocery", "fashion"],
+        enum : {
+            values : ["electronics", "grocery", "fashion"],
+            message : 'enum validator failed for `{PATH}` with value `{VALUE}`'
+        },
         required : true
     }
 })
