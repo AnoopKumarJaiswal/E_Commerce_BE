@@ -60,7 +60,7 @@ router.get("/products/:id" , async(req, res) =>{
 
 
 
-router.delete("/products/:id", async(req,res) =>{
+router.delete("/products/delete/:id", async(req,res) =>{
    try {
        const {id} = req.params
        if(!id)
@@ -68,13 +68,31 @@ router.delete("/products/:id", async(req,res) =>{
         throw new Error("Please Provide a product Id")
        } 
 
-       const updatedProducts = await Product.findByIdAndDelete(id)
+       const updatedProducts = await Product.findByIdAndDelete(id, {new : true})
        res.status(200).json({Success : true , data : updatedProducts})
    } catch (error) {
     res.status(400).json({error : error.message})
    }
 })
 
+
+
+
+router.patch("/products/edit/:id", async(req , res) => {
+  try {
+         const {id} = req.params
+         const {name , price, desc, quantity, image , catagory} = req.body
+         if(!id)
+         {
+          throw new Error("Product Does not exist")
+         }
+
+         const updatedProducts = await Product.findByIdAndUpdate(id ,{name , price, desc, quantity, image , catagory}, {new : true})
+         res.status(200).json({Success : true , data : updatedProducts})
+  } catch (error) {
+      res.status(400).json({error : error.message})
+  }
+})
 
 
 
