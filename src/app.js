@@ -4,7 +4,11 @@ const app = express()
 const mongoose = require("mongoose");
 const { productRouter } = require("./Routes/Product");
 const { userRouter } = require("./Routes/User");
-const cp = require("cookie-parser")
+const cp = require("cookie-parser");
+const { buyerRuter } = require("./Routes/Buyer");
+const { isLoggedIn } = require("./Middlewares/isLoggedIn");
+const { isSeller } = require("./Middlewares/isSellor");
+const { isBuyer } = require("./Middlewares/isBuyer");
 
 
 mongoose.connect(process.env.MONGODB_URL)
@@ -21,5 +25,6 @@ mongoose.connect(process.env.MONGODB_URL)
 
 app.use(cp())
 app.use(express.json())
-app.use("/api" , productRouter)
+app.use("/api", isLoggedIn, productRouter)
 app.use("/api", userRouter)
+app.use("/api",isLoggedIn, isBuyer, isSeller, buyerRuter)
