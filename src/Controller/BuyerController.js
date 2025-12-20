@@ -1,7 +1,9 @@
+const {Product} = require("../Model/Product")
+
 const addProduct = async(req, res) =>{
    try {
          const {id, q} = req.query
-         const foundProduct = await Product.findById(id).select("name price desc image")
+         const foundProduct = await Product.findById(id)
          if(!foundProduct)
          {
             throw new Error("Product does not exist")
@@ -20,8 +22,6 @@ const addProduct = async(req, res) =>{
             }
             
         }
-        console.log(prevCart)
-
 
         if(!isProduct)
         {

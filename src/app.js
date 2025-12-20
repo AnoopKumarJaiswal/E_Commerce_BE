@@ -25,6 +25,6 @@ mongoose.connect(process.env.MONGODB_URL)
 
 app.use(cp())
 app.use(express.json())
-app.use("/api", isLoggedIn, productRouter)
 app.use("/api", userRouter)
-app.use("/api",isLoggedIn, isBuyer, isSeller, buyerRuter)
+app.use("/api", buyerRuter)
+app.use("/api",  productRouter)
