@@ -6,10 +6,7 @@ const { productRouter } = require("./Routes/Product");
 const { userRouter } = require("./Routes/User");
 const cp = require("cookie-parser");
 const { buyerRuter } = require("./Routes/Buyer");
-const { isLoggedIn } = require("./Middlewares/isLoggedIn");
-const { isSeller } = require("./Middlewares/isSellor");
-const { isBuyer } = require("./Middlewares/isBuyer");
-
+const cors = require("cors")
 
 mongoose.connect(process.env.MONGODB_URL)
 .then(() =>{
@@ -23,6 +20,12 @@ mongoose.connect(process.env.MONGODB_URL)
     console.log("DB Connection Failed")
 })
 
+
+app.use(cors({
+    origin : ["http://localhost:5173"],
+    methods : ["GET", "PUT", "PATCH", "DELETE", "POST"],
+    credentials : true
+}))
 app.use(cp())
 app.use(express.json())
 app.use("/api", userRouter)

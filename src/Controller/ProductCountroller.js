@@ -33,8 +33,8 @@ const createProducts = async(req, res) =>{
           {
             throw new Error("Category should be electronics/grocery/fashion")
           }
-
-         const createdProduct =  await Product.create({name , price, desc, quantity, image , category})
+         const user = req.user._id
+         const createdProduct =  await Product.create({name , price, desc, quantity, image , category , user})
          res.status(201).json({Success : true , data : createdProduct})
 
     } catch (error) {
@@ -42,10 +42,64 @@ const createProducts = async(req, res) =>{
     }
 }
 
-const getProducts =  async(req, res) =>{
+
+const filterProduct = async(req,res) =>{
+  try {
+         const {category} = req.params
+         const {postCount, pagNum} = req.query
+         const filterFoundProduct = await Product.find({
+          category : {$in : category}
+         }).limit(postCount).skip(pagNum * postCount - postCount)
+
+         res.status(200).json({Success : true , data : filterFoundProduct})
+  } catch (error) {
+    res.status(400).json({error : error.message})
+  }
+}
+
+
+const getAllProduct = async(req,res) =>{
+  try {
+        const {postCount, pagNum} = req.query
+        const foundProduct = await Product.find().limit(postCount).skip(pagNum * postCount - postCount)
+        res.status(200).json({Success : true, count : foundProduct.length, data  : foundProduct})
+  } catch (error) {
+     res.status(400).json({error : error.message})
+  }
+}
+
+
+const getProductAdminWise = async(req, res) =>{
+  try {
+       const foundProduct = await Product.find({user : req.user._id})
+       console.log(foundProduct)
+       res.status(200).json({Success : true, data : foundProduct})
+  } catch (error) {
+    res.status(400).json({error : error.message})
+  }
+}
+
+const getProductsByQuery =  async(req, res) =>{
+    try {
+           const {q} = req.query
+           const foundProduct = await Product.find({
+            name : {$regex : q}
+           })
+          if(!foundProduct)
+            {
+              throw new Error("Product not Exist")
+            }           
+
+           res.status(200).json({Success : true , data : foundProduct})
+    } catch (error) {
+        res.status(400).json({error : error.message})
+    }
+}
+
+const getProductsById =  async(req, res) =>{
     try {
            const {id} = req.params
-           const foundProduct = await Product.findById(id)
+           const foundProduct = await Product.findById({_id : id})
           if(!foundProduct)
             {
               throw new Error("Product not Exist")
@@ -122,9 +176,14 @@ const editProduct = async(req , res) => {
 
 
 
+
 module.exports = {
     createProducts,
-    getProducts,
+    getAllProduct,
+    getProductsById,
     deleteProduct,
-    editProduct
+    editProduct,
+    filterProduct,
+    getProductAdminWise,
+    getProductsByQuery
 }

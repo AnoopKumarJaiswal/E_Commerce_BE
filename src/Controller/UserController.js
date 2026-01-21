@@ -30,7 +30,7 @@ const userSignup = async(req, res) =>{
          }
          if(!role || !["seller", "buyer"].includes(role))
          {
-            throw new Error("You can create either Buyer or seller Account")
+            throw new Error("You can create either buyer or seller Account")
          }
          if(!password)
          {
@@ -69,13 +69,13 @@ const userSignin = async(req,res) =>{
           const {userName , password} = req.body
           if(!userName)
           {
-            throw new Error("Please enter a bvalid userName")
+            throw new Error("Please enter a valid userName")
           }
           if(!password)
           {
             throw new Error("Please Enter your password")
           }
-         const foundUser = await User.findOne({userName: userName.toLowerCase()})
+         const foundUser = await User.findOne({userName: userName.toLowerCase()}).populate("cart.product")
         
         if(!foundUser)
         {
@@ -89,8 +89,8 @@ const userSignin = async(req,res) =>{
         }
 
       const token = jwt.sign({id : foundUser._id}, process.env.JWT_SECRET)
-      const {firstName, lastName, userName : un , profilePicture, mobile, role } = foundUser
-      res.cookie("loginToken", token, {maxAge : 24 * 60 *60 * 1000}).status(200).json({Success : true, msg : "Yor are loggedIn now" , userData : {firstName, lastName, userName : un , profilePicture, mobile, role}})
+      const {firstName, lastName, userName : un , profilePicture, mobile, role, cart } = foundUser
+      res.cookie("loginToken", token, {maxAge : 24 * 60 *60 * 1000}).status(200).json({Success : true, msg : "Yor are loggedIn now" , userData : {firstName, lastName, userName : un , profilePicture, mobile, role, cart}})
 
     } catch (error) {
         res.status(400).json({error : error.message})
@@ -103,9 +103,22 @@ const userSignout = async(req,res) =>{
 }
 
 
+
+const userData = async(req, res) =>{
+    try {
+        await req.user.populate("cart.product")
+        const {firstName, lastName, userName , profilePicture, mobile, role , cart , _id} = req.user
+        res.status(200).json({Success : true, data : {firstName, lastName, userName , profilePicture, mobile, role ,  cart, _id}})
+    } catch (error) {
+        res.status(400).json({error : error.message})
+    }
+}
+
+
 module.exports = {
     userSignup,
     userSignin,
-    userSignout
+    userSignout,
+    userData
  
 }
