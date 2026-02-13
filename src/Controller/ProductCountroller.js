@@ -1,175 +1,158 @@
-const {Product} = require("../Model/Product")
+const { Product } = require("../Model/Product")
 
-const createProducts = async(req, res) =>{
-    try {
-          const {name , price, desc, quantity, image , category} = req.body
-          if(!name || name.length < 2 || name.length > 80)
-          {
-            throw new Error("Please Provide Valid Product Name")
-          }
-          if(!price || price < 1)
-          {
-            throw new Error("Please Provide Product price")
-          }
-          if(!desc || desc.length  < 10 ||  desc.length > 250)
-          {
-            throw new Error("Please Provide valid Product  desc")
-          }
-          if(!quantity || quantity < 1)
-          {
-            throw new Error("Please Provide Product quantity")
-          }
-          if(!image)
-          {
-            throw new Error("Please Provide Product Image")
-          }
-          if(!category )
-          {
-            throw new Error("Please Provide Product category")
-          }
-
-          const allowCategroies = ["fashion" , "grocery", "electronics"]
-          if(!allowCategroies.includes(category))
-          {
-            throw new Error("Category should be electronics/grocery/fashion")
-          }
-         const user = req.user._id
-         const createdProduct =  await Product.create({name , price, desc, quantity, image , category , user})
-         res.status(201).json({Success : true , data : createdProduct})
-
-    } catch (error) {
-        res.status(400).json({error : error.message})
-    }
-}
-
-
-const filterProduct = async(req,res) =>{
+const createProducts = async (req, res) => {
   try {
-         const {category} = req.params
-         const {postCount, pagNum} = req.query
-         const filterFoundProduct = await Product.find({
-          category : {$in : category}
-         }).limit(postCount).skip(pagNum * postCount - postCount)
+    const { name, price, desc, quantity, image, category } = req.body
+    if (!name || name.length < 2 || name.length > 80) {
+      throw new Error("Please Provide Valid Product Name")
+    }
+    if (!price || price < 1) {
+      throw new Error("Please Provide Product price")
+    }
+    if (!desc || desc.length < 10 || desc.length > 250) {
+      throw new Error("Please Provide valid Product  desc")
+    }
+    if (!quantity || quantity < 1) {
+      throw new Error("Please Provide Product quantity")
+    }
+    if (!image) {
+      throw new Error("Please Provide Product Image")
+    }
+    if (!category) {
+      throw new Error("Please Provide Product category")
+    }
 
-         res.status(200).json({Success : true , data : filterFoundProduct})
+    const allowCategroies = ["fashion", "grocery", "electronics"]
+    if (!allowCategroies.includes(category)) {
+      throw new Error("Category should be electronics/grocery/fashion")
+    }
+    const user = req.user._id
+    const createdProduct = await Product.create({ name, price, desc, quantity, image, category, user })
+    res.status(201).json({ Success: true, data: createdProduct })
+
   } catch (error) {
-    res.status(400).json({error : error.message})
+    res.status(400).json({ error: error.message })
   }
 }
 
 
-const getAllProduct = async(req,res) =>{
+const filterProduct = async (req, res) => {
   try {
-        const {postCount, pagNum} = req.query
-        const foundProduct = await Product.find().limit(postCount).skip(pagNum * postCount - postCount)
-        res.status(200).json({Success : true, count : foundProduct.length, data  : foundProduct})
+    const { category } = req.params
+    const { postCount, pagNum } = req.query
+    const filterFoundProduct = await Product.find({
+      category: { $in: category }
+    }).limit(postCount).skip(pagNum * postCount - postCount)
+
+    res.status(200).json({ Success: true, data: filterFoundProduct })
   } catch (error) {
-     res.status(400).json({error : error.message})
+    res.status(400).json({ error: error.message })
   }
 }
 
 
-const getProductAdminWise = async(req, res) =>{
+const getAllProduct = async (req, res) => {
   try {
-       const foundProduct = await Product.find({user : req.user._id})
-       console.log(foundProduct)
-       res.status(200).json({Success : true, data : foundProduct})
+    const { postCount, pagNum } = req.query
+    const foundProduct = await Product.find().limit(postCount).skip(pagNum * postCount - postCount)
+    res.status(200).json({ Success: true, count: foundProduct.length, data: foundProduct })
   } catch (error) {
-    res.status(400).json({error : error.message})
+    res.status(400).json({ error: error.message })
   }
 }
 
-const getProductsByQuery =  async(req, res) =>{
-    try {
-           const {q} = req.query
-           const foundProduct = await Product.find({
-            name : {$regex : q}
-           })
-          if(!foundProduct)
-            {
-              throw new Error("Product not Exist")
-            }           
 
-           res.status(200).json({Success : true , data : foundProduct})
-    } catch (error) {
-        res.status(400).json({error : error.message})
-    }
-}
-
-const getProductsById =  async(req, res) =>{
-    try {
-           const {id} = req.params
-           const foundProduct = await Product.findById({_id : id})
-          if(!foundProduct)
-            {
-              throw new Error("Product not Exist")
-            }           
-
-           res.status(200).json({Success : true , data : foundProduct})
-    } catch (error) {
-        res.status(400).json({error : error.message})
-    }
-}
-
-const deleteProduct = async(req,res) =>{
-   try {
-       const {id} = req.params
-       const foundProduct = await Product.findById(id)
-       if(!foundProduct)
-       {
-        throw new Error("Product does not exist")
-       }
-
-       const updatedProducts = await Product.findByIdAndDelete(id)
-       res.status(200).json({Success : true , data : updatedProducts})
-   } catch (error) {
-    res.status(400).json({error : error.message})
-   }
-}
-
-const editProduct = async(req , res) => {
+const getProductAdminWise = async (req, res) => {
   try {
-         const {id} = req.params
-         const {name , price, desc, quantity, image , category} = req.body
-         if(!id)
-         {
-          throw new Error("Product Does not exist")
-         }
+    const foundProduct = await Product.find({ user: req.user._id })
 
-
-         if(name?.length < 2 || name?.length > 80 )
-         {
-          throw new Error("Product Name should be greaterthan 2 and less than 80")
-         }
-
-
-         if(price < 1 )
-         {
-          throw new Error("Price Should be greate than 1 rupees")
-         }
-
-         if(desc?.length  < 10 ||  desc?.length > 250)
-         {
-          throw new Error("Desc should be greaterthan 10 and less than 250")
-         }
-         
-         if(quantity < 1)
-         {
-          throw new Error("Quantity Should be greate than 1 rupees")
-         }
-        if(category)
-          {
-            const allowCategroies = ["fashion" , "grocery", "electronics"]
-            if(!allowCategroies.includes(category))
-            {
-              throw new Error("Category should be electronics/grocery/fashion")
-            }
-        }
-
-         const updatedProducts = await Product.findByIdAndUpdate(id ,{name , price, desc, quantity, image , category}, {new : true})
-         res.status(200).json({Success : true , data : updatedProducts})
+    res.status(200).json({ Success: true, data: foundProduct })
   } catch (error) {
-      res.status(400).json({error : error.message})
+    res.status(400).json({ error: error.message })
+  }
+}
+
+const getProductsByQuery = async (req, res) => {
+  try {
+    const { q } = req.query
+    const foundProduct = await Product.find({
+      name: { $regex: q }
+    })
+    if (!foundProduct) {
+      throw new Error("Product not Exist")
+    }
+
+    res.status(200).json({ Success: true, data: foundProduct })
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+const getProductsById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const foundProduct = await Product.findById({ _id: id })
+    if (!foundProduct) {
+      throw new Error("Product not Exist")
+    }
+
+    res.status(200).json({ Success: true, data: foundProduct })
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params
+    const foundProduct = await Product.findById(id)
+    if (!foundProduct) {
+      throw new Error("Product does not exist")
+    }
+
+    const updatedProducts = await Product.findByIdAndDelete(id)
+    res.status(200).json({ Success: true, data: updatedProducts })
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
+const editProduct = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { name, price, desc, quantity, image, category } = req.body
+    if (!id) {
+      throw new Error("Product Does not exist")
+    }
+
+
+    if (name?.length < 2 || name?.length > 80) {
+      throw new Error("Product Name should be greaterthan 2 and less than 80")
+    }
+
+
+    if (price < 1) {
+      throw new Error("Price Should be greate than 1 rupees")
+    }
+
+    if (desc?.length < 10 || desc?.length > 250) {
+      throw new Error("Desc should be greaterthan 10 and less than 250")
+    }
+
+    if (quantity < 1) {
+      throw new Error("Quantity Should be greate than 1 rupees")
+    }
+    if (category) {
+      const allowCategroies = ["fashion", "grocery", "electronics"]
+      if (!allowCategroies.includes(category)) {
+        throw new Error("Category should be electronics/grocery/fashion")
+      }
+    }
+
+    const updatedProducts = await Product.findByIdAndUpdate(id, { name, price, desc, quantity, image, category }, { new: true })
+    res.status(200).json({ Success: true, data: updatedProducts })
+  } catch (error) {
+    res.status(400).json({ error: error.message })
   }
 }
 
@@ -178,12 +161,12 @@ const editProduct = async(req , res) => {
 
 
 module.exports = {
-    createProducts,
-    getAllProduct,
-    getProductsById,
-    deleteProduct,
-    editProduct,
-    filterProduct,
-    getProductAdminWise,
-    getProductsByQuery
+  createProducts,
+  getAllProduct,
+  getProductsById,
+  deleteProduct,
+  editProduct,
+  filterProduct,
+  getProductAdminWise,
+  getProductsByQuery
 }
