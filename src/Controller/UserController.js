@@ -90,7 +90,7 @@ const userSignin = async(req,res) =>{
 
       const token = jwt.sign({id : foundUser._id}, process.env.JWT_SECRET)
       const {firstName, lastName, userName : un , profilePicture, mobile, role, cart } = foundUser
-      res.cookie("loginToken", token, {maxAge : 24 * 60 *60 * 1000}).status(200).json({Success : true, msg : "Yor are loggedIn now" , userData : {firstName, lastName, userName : un , profilePicture, mobile, role, cart}})
+      res.cookie("loginToken", token, { httpOnly: true, secure: true,sameSite: "None", maxAge : 24 * 60 *60 * 1000}).status(200).json({Success : true, msg : "Yor are loggedIn now" , userData : {firstName, lastName, userName : un , profilePicture, mobile, role, cart}})
 
     } catch (error) {
         res.status(400).json({error : error.message})

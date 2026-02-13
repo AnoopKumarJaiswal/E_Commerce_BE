@@ -7,7 +7,7 @@ const { isLoggedIn } = require("../Middlewares/isLoggedIn")
 
 router.post("/signup", userSignup )
 router.post("/signin" , userSignin )
-router.post("/signout", userSignout )
+router.post("/signout", userSignout)
 router.get("/get-user-data" , isLoggedIn, userData)
 
 
