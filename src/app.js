@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGODB_URL)
 
 
 app.use(cors({
-    origin: ["http://localhost:5173", "https://e-commerce-fe-8z5p.onrender.com"],
+    origin: true,
     methods: ["GET", "PUT", "PATCH", "DELETE", "POST"],
     credentials: true
 }))
